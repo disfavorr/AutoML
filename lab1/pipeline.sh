@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pip install numpy pandas scikit-learn joblib
+# pip install numpy pandas scikit-learn joblib
 
 python data_creation.py
 python data_preprocessing.py

@@ -2,16 +2,17 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 import joblib
 
-# Загрузка предобработанных данных
-train_data = pd.read_csv('lab1/train/preprocessed_data.csv')
+feature_cols = [
+    "Attendance (%)", "Midterm_Score", "Final_Score", "Assignments_Avg",
+    "Quizzes_Avg", "Participation_Score", "Projects_Score",
+    "Study_Hours_per_Week", "Stress_Level (1-10)", "Sleep_Hours_per_Night"
+]
 
-# Разделение признаков и целевой переменной
-X_train = train_data[['feature']]
-y_train = train_data['target']
+train_data = pd.read_csv('./train/preprocessed_data.csv')
+X_train = train_data[feature_cols]
+y_train = train_data["Total_Score"]
 
-# Инициализация и обучение модели
 model = LinearRegression()
 model.fit(X_train, y_train)
 
-# Сохранение обученной модели
-joblib.dump(model, 'lab1/model.pkl')
+joblib.dump(model, '/model.pkl')

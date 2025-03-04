@@ -2,22 +2,35 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 import joblib
 
-# Загрузка данных
-train_data = pd.read_csv('lab1/train/data.csv')
-test_data = pd.read_csv('lab1/test/data.csv')
+# Все столбцы, которые будут являться признаками для модели
+feature_cols = [
+    "Attendance (%)", "Midterm_Score", "Final_Score", "Assignments_Avg",
+    "Quizzes_Avg", "Participation_Score", "Projects_Score",
+    "Study_Hours_per_Week", "Stress_Level (1-10)", "Sleep_Hours_per_Night"
+]
 
-# Инициализация стандартизатора
-scaler = StandardScaler()
+def preprocess_data(input_file, output_file, scaler=None, fit_scaler=False):
+    data = pd.read_csv(input_file)
+    X = data[feature_cols]
+    y = data["Total_Score"]
+    
+    if fit_scaler:
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
 
-# Обучение стандартизатора на обучающих данных и трансформация
-train_data[['feature']] = scaler.fit_transform(train_data[['feature']])
+        joblib.dump(scaler, '/scaler.pkl')
+    else:
+        X_scaled = scaler.transform(X)
+    
+    # DataFrame с признаками и целевой переменной, которая будет предсказываться (Total_Score)
+    df_processed = pd.DataFrame(X_scaled, columns=feature_cols)
+    df_processed["Total_Score"] = y.values
+    
+    df_processed.to_csv(output_file, index=False)
+    return scaler
 
-# Трансформация тестовых данных
-test_data[['feature']] = scaler.transform(test_data[['feature']])
+# Обработка обучающих данных
+scaler = preprocess_data('./train/data.csv', './train/preprocessed_data.csv', fit_scaler=True)
 
-# Сохранение предобработанных данных
-train_data.to_csv('lab1/train/preprocessed_data.csv', index=False)
-test_data.to_csv('lab1/test/preprocessed_data.csv', index=False)
-
-# Сохранение обученного стандартизатора
-joblib.dump(scaler, 'lab1/scaler.pkl')
+# Обработка тестовых данных с использованием уже обученного scaler
+preprocess_data('./test/data.csv', './test/preprocessed_data.csv', scaler=scaler, fit_scaler=False)
