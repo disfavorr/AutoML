@@ -1,0 +1,11 @@
+FROM python:3.11.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN pip install -r requirements.txt
+
+COPY data_creation.py data_preprocessing.py model_preparation.py model_testing.py pipeline.sh Students_Grading_Dataset.csv /app/
+
+CMD ["bash"]
